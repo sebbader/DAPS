@@ -1,0 +1,109 @@
+openapi: 3.0.0
+info:
+  title: Dynamic Attribute Provisioning Service (DAPS) 2.0
+  description: This is the API description of the DAPS, the essential part of the
+    International Data Spaces (IDS) Identity Provider. More information of the IDS
+    can be found in the (IDS Reference Architecture Model)[]
+  version: 0.1.0
+servers:
+- url: https://{authority}/{basePath}
+  description: todo
+  variables:
+    authority:
+      description: The authority of the server URL containing the domain name and
+        port.
+      default: daps.aisec.fraunhofer.de
+    basePath:
+      description: The base path at the server to the DAPS endpoint.
+- url: https://example.com/ids/daps/
+  description: Example URL
+security:
+- application:
+  - read
+  - write
+tags:
+- name: DAT Request
+  description: Endpoint(s)
+- name: Administration
+  description: TODO
+paths:
+  /:
+    get:
+      summary: TODO
+      description: This is an example operation to show how security is applied to
+        the call.
+      responses:
+        "200":
+          description: OK
+    post:
+      summary: TODO
+      description: This is an example operation to show how security is applied to
+        the call.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestToken'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+  /infrastructure:
+    get:
+      summary: TODO
+      responses:
+        "200":
+          description: OK
+    post:
+      summary: TODO
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    RequestToken:
+      allOf:
+      - $ref: '#/components/schemas/JwtHeader'
+      - $ref: '#/components/schemas/RequestPayload'
+      - $ref: '#/components/schemas/Signature'
+    ResponseToken:
+      allOf:
+      - $ref: '#/components/schemas/JwtHeader'
+      - $ref: '#/components/schemas/DatPayload'
+      - $ref: '#/components/schemas/Signature'
+    JwtHeader:
+      type: object
+      properties:
+        algorithm:
+          type: string
+          example: RS256
+    RequestPayload:
+      type: object
+      properties:
+        '@context':
+          type: string
+        '@type':
+          type: string
+          example: ids:DatRequestPayload
+    DatPayload:
+      type: object
+      properties:
+        '@context':
+          type: string
+        '@type':
+          type: string
+          example: ids:DatPayload
+    Signature:
+      type: string
+  securitySchemes:
+    application:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: http://example.com/oauth/token
+          scopes:
+            write: allows modifying resources
+            read: allows reading resources
