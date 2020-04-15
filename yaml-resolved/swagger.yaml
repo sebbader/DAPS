@@ -23,47 +23,287 @@ security:
   - write
 tags:
 - name: DAT Request
-  description: Endpoint(s)
+  description: Endpoint for requesting DAT's.
 - name: Administration
-  description: TODO
+  description: DAPS Endpoint for managing the known identities, add new ones and revoke
+    others.
 paths:
-  /:
-    get:
-      summary: TODO
-      description: This is an example operation to show how security is applied to
-        the call.
+  /a:
+    post:
+      tags:
+      - DAT Request
+      summary: Request Dynamic Attribute Token
+      description: A client that requests a DAT needs to create JWT as a request token.
+        The JWT contains a header, payload and signature. The information content
+        of the JWT is modeled as an instance of the ids:DatPayload class, with the
+        content attributes as specified in the table below.
+      parameters:
+      - name: grant_type
+        in: header
+        description: OAuth based grant type. See client_credentials grant.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: client_credentials
+      - name: client_assertion_type
+        in: header
+        description: See JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+          and Authorization Grants.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+      - name: client_assertion
+        in: header
+        description: The signed and base64 encoded request token. Paste the example
+          to jwt.io to see the decoded JWT. The token is signed with the connectors
+          private key belonging to the public key contained in the X.509 certificate.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJkZW1vY29ubmVjdG9yMSIsInN1YiI6ImRlbW9jb25uZWN0b3IxIiwiZXhwIjoxNTQ4Nzg1Mzg2LCJuYmYiOjE1NDg3ODE3ODYsImlhdCI6MTU0ODc4MTc4NiwiYXVkIjoiaHR0cHM6Ly9hcGkubG9jYWxob3N0In0.JSQuMf-9Fd7DNna_-s-sR7eXgcSYNCau5WgurrGJTuCSLKqhZe3odXfunN2vRFgUhU21ADFlEq96mlbQDueBlMtaXrcHFPSpIUtvuIMIVqQcGYkDdSJr_VmDuAykCYpyTCkLa7a8DTV-N3sECp-AxUgmEzYIfh8jW0WS6ehgUzrnpH6t_h_GWXKkNSAg3ERakDc4NY02pBGmiN7bmtLZNt5b4LWALiiFiduC7JbIpx4awOU6skMApmzgLnZmmTG20JlJRg6hAqyHEz5Cd4rUgrt0twmpC0Us_CG23KdUF5fWI55dcO2qAVvhNQXpqz7IiPcF7-jgkrx4oukYNY6eHA
+      - name: scope
+        in: header
+        description: Currently, the scope is limited to 'Connector' but can be used
+          for scoping purposes in the future. Scope is currently fixed to https://w3id.org/idsa/core/Connector.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: https://w3id.org/idsa/core/Connector
       responses:
         "200":
           description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJAY29udGV4dCI6Imh0dHBzOi8vdzNpZC5vcmcvaWRzYS9jb250ZXh0cy8zLjAuMC9jb250ZXh0Lmpzb24iLCJAdHlwZSI6ImlkczpEYXRQYXlsb2FkIiwiaXNzIjoiREQ6Q0I6RkQ6MEI6OTM6ODQ6MzM6MDE6MTE6RUI6NUQ6OTQ6OTQ6ODg6QkU6Nzg6N0Q6NTc6RkM6NEE6a2V5aWQ6Q0I6OEM6Qzc6QjY6ODU6Nzk6QTg6MjM6QTY6Q0I6MTU6QUI6MTc6NTA6MkY6RTY6NjU6NDM6NUQ6RTgiLCJzdWIiOiJERDpDQjpGRDowQjo5Mzo4NDozMzowMToxMTpFQjo1RDo5NDo5NDo4ODpCRTo3ODo3RDo1NzpGQzo0QTprZXlpZDpFMTo4QzpDNzpCNjo4NTo3OTpBODoyMzpBNjpDQjowMzpBQjoxNzo1MDoyRjpFNjo2NTo0Mzo1RDpGOSIsImV4cCI6MTYwMDAwMDAwMCwiaWF0IjoxNTg1MTQ5MDM2LCJuYmYiOjE1ODUxNDkwMzYsImF1ZCI6InNvbGlvdCIsInNjb3BlIjoiaHR0cHM6Ly93M2lkLm9yZy9pZHNhL2NvcmUvQ29ubmVjdG9yIiwicmVmZXJyaW5nQ29ubmVjdG9yIjoiaHR0cDovL2xvY2FsaG9zdCIsInRyYW5zcG9ydENlcnRzU2hhMjU2IjpbInB1YmxpYyBrZXkgb2YgdHJhbnNwb3J0IGNlcnQiXSwic2VjdXJpdHlQcm9maWxlIjoiaWRzYzpCYXNlQ29ubmVjdG9yIiwiZXh0ZW5kZWRHdWFyYW50ZWUiOlsiaWRzYzpSRU1PVEVfTE9HR0lORyJdfQ.r59C02EhSHbKipDF1sX3gWDifdNNnf87U9pq7ICImH07VdYsOOuaWtlGNWw1LgOvRgfwTigsrpyhZ7nnIc0PS3hDTTTa-G1rn-grUEzrGEX_xGNbm78nxiyJZ8yGQ2ivxlDxXu_i9QSZ6VnR-9O1OznwB6MGzVKlGmgVeoMFvdEOpvVaXG4p6fbMtvwVv6CiZf2JJw_Chjr_evpAcMPzWoJ3vG8j9c-PznV1WGc1ZbpOhACpOwt_1lUqI9OUginsRJxF6-rLmvdW25WSoxzJP5N_Q1UxF7BCPnzJJWhI-L454NxpYv-Cqhxs020DVyTgtHttzu3-G_qPEWzDhbY2rA
+        "400":
+          description: Bad Request. The Request Token might be invalid.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: An explanation why the request was rejected.
+        "401":
+          description: Unauthorized. The DAPS does not know the sender or actively
+            refuses the request.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: An explanation why the request was rejected.
+  /b:
     post:
-      summary: TODO
-      description: This is an example operation to show how security is applied to
-        the call.
+      tags:
+      - DAT Request
+      summary: Request Dynamic Attribute Token
+      description: A client that requests a DAT needs to create JWT as a request token.
+        The JWT contains a header, payload and signature. The information content
+        of the JWT is modeled as an instance of the ids:DatPayload class, with the
+        content attributes as specified in the table below.
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RequestToken'
+              $ref: '#/components/schemas/DatRequestBody'
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJAY29udGV4dCI6Imh0dHBzOi8vdzNpZC5vcmcvaWRzYS9jb250ZXh0cy8zLjAuMC9jb250ZXh0Lmpzb24iLCJAdHlwZSI6ImlkczpEYXRQYXlsb2FkIiwiaXNzIjoiREQ6Q0I6RkQ6MEI6OTM6ODQ6MzM6MDE6MTE6RUI6NUQ6OTQ6OTQ6ODg6QkU6Nzg6N0Q6NTc6RkM6NEE6a2V5aWQ6Q0I6OEM6Qzc6QjY6ODU6Nzk6QTg6MjM6QTY6Q0I6MTU6QUI6MTc6NTA6MkY6RTY6NjU6NDM6NUQ6RTgiLCJzdWIiOiJERDpDQjpGRDowQjo5Mzo4NDozMzowMToxMTpFQjo1RDo5NDo5NDo4ODpCRTo3ODo3RDo1NzpGQzo0QTprZXlpZDpFMTo4QzpDNzpCNjo4NTo3OTpBODoyMzpBNjpDQjowMzpBQjoxNzo1MDoyRjpFNjo2NTo0Mzo1RDpGOSIsImV4cCI6MTYwMDAwMDAwMCwiaWF0IjoxNTg1MTQ5MDM2LCJuYmYiOjE1ODUxNDkwMzYsImF1ZCI6InNvbGlvdCIsInNjb3BlIjoiaHR0cHM6Ly93M2lkLm9yZy9pZHNhL2NvcmUvQ29ubmVjdG9yIiwicmVmZXJyaW5nQ29ubmVjdG9yIjoiaHR0cDovL2xvY2FsaG9zdCIsInRyYW5zcG9ydENlcnRzU2hhMjU2IjpbInB1YmxpYyBrZXkgb2YgdHJhbnNwb3J0IGNlcnQiXSwic2VjdXJpdHlQcm9maWxlIjoiaWRzYzpCYXNlQ29ubmVjdG9yIiwiZXh0ZW5kZWRHdWFyYW50ZWUiOlsiaWRzYzpSRU1PVEVfTE9HR0lORyJdfQ.r59C02EhSHbKipDF1sX3gWDifdNNnf87U9pq7ICImH07VdYsOOuaWtlGNWw1LgOvRgfwTigsrpyhZ7nnIc0PS3hDTTTa-G1rn-grUEzrGEX_xGNbm78nxiyJZ8yGQ2ivxlDxXu_i9QSZ6VnR-9O1OznwB6MGzVKlGmgVeoMFvdEOpvVaXG4p6fbMtvwVv6CiZf2JJw_Chjr_evpAcMPzWoJ3vG8j9c-PznV1WGc1ZbpOhACpOwt_1lUqI9OUginsRJxF6-rLmvdW25WSoxzJP5N_Q1UxF7BCPnzJJWhI-L454NxpYv-Cqhxs020DVyTgtHttzu3-G_qPEWzDhbY2rA
+        "400":
+          description: Bad Request. The Request Token might be invalid.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: An explanation why the request was rejected.
+        "401":
+          description: Unauthorized. The DAPS does not know the sender or actively
+            refuses the request.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: An explanation why the request was rejected.
+  /infrastructureA:
+    get:
+      tags:
+      - Administration
+      summary: Read the known ids:Participants
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseToken'
-  /infrastructure:
-    get:
-      summary: TODO
-      responses:
-        "200":
-          description: OK
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParticipantJsonLd'
     post:
-      summary: TODO
+      tags:
+      - Administration
+      summary: Create a new Participant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParticipantJsonLd'
+      responses:
+        "201":
+          description: OK
+        "400":
+          description: Bad Request. The JSON-LD might be invalid.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: An explanation why the request was rejected.
+        "401":
+          description: Unauthorized. The DAPS does not know the sender or actively
+            refuses the request.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: An explanation why the request was rejected.
+  /infrastructureA/{Praticipant label}/:
+    get:
+      tags:
+      - Administration
+      description: todo
+      parameters:
+      - name: Praticipant label
+        in: path
+        description: todo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
-          description: OK
+          description: Ok.
+    put:
+      tags:
+      - Administration
+      description: todo
+      parameters:
+      - name: Praticipant label
+        in: path
+        description: todo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok.
+    delete:
+      tags:
+      - Administration
+      description: todo
+      parameters:
+      - name: Praticipant label
+        in: path
+        description: todo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok.
+  /infrastructureB:
+    post:
+      tags:
+      - Infrastructure
+      summary: waits for infrastructure-related messages
+      description: Endpoint for infrastructure communication (register, announce,
+        unregister, request identity, etc.). Note that the supplied JSON schema only
+        reflects the example message. Other messages and payloads are possible as
+        long as they conform to the IDS Information Model.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/body'
+            encoding:
+              header:
+                contentType: application/json
+                style: form
+              payload:
+                contentType: application/ld+json
+                style: form
+      responses:
+        "200":
+          description: Message received. Does *not* indicate that the message was
+            processed successfully. See the ResponseMessage whether the connector
+            was able to perform the requested activity accordingly. Note that the
+            JSON schema supplied as part of this document only describes the message
+            fom the example. More message types are possible, as described in the
+            IDS Information Model. Please also note that the 'Example Value' below
+            is *not* a proper Multipart response but a JSON object. The connector
+            will respond with Multipart nevertheless.
+          content:
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              encoding:
+                header:
+                  contentType: application/ld+json
+                  style: form
+        "400":
+          description: Invalid HTTP call. Please recheck your syntax. IDS parsing
+            layers have not been reached, so the error might be caused at the level
+            of the HTTP request creation.
+        "404":
+          description: Not existing endpoint, most probably the connector is not deployed
+            at this loation or not accessible.
+        "500":
+          description: Internal error at the connector, more details might be provided
+            in the response body (not necessarily an IDS Message). Probably the connector
+            has issues parsing your message header or payload. Please verify that
+            both are valid JSON-LD elements conforming to the IDS Information Model.
 components:
   schemas:
+    DatRequestBody:
+      type: object
+      properties:
+        grant_type:
+          type: string
+          description: OAuth based grant type. See client_credentials grant.
+          example: client_credentials
+        client_assertion_type:
+          type: string
+          description: See JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+            and Authorization Grants.
+          example: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+        client_assertion:
+          type: string
+          description: The signed and base64 encoded request token. Paste the example
+            to jwt.io to see the decoded JWT. The token is signed with the connectors
+            private key belonging to the public key contained in the X.509 certificate.
+          example: eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJkZW1vY29ubmVjdG9yMSIsInN1YiI6ImRlbW9jb25uZWN0b3IxIiwiZXhwIjoxNTQ4Nzg1Mzg2LCJuYmYiOjE1NDg3ODE3ODYsImlhdCI6MTU0ODc4MTc4NiwiYXVkIjoiaHR0cHM6Ly9hcGkubG9jYWxob3N0In0.JSQuMf-9Fd7DNna_-s-sR7eXgcSYNCau5WgurrGJTuCSLKqhZe3odXfunN2vRFgUhU21ADFlEq96mlbQDueBlMtaXrcHFPSpIUtvuIMIVqQcGYkDdSJr_VmDuAykCYpyTCkLa7a8DTV-N3sECp-AxUgmEzYIfh8jW0WS6ehgUzrnpH6t_h_GWXKkNSAg3ERakDc4NY02pBGmiN7bmtLZNt5b4LWALiiFiduC7JbIpx4awOU6skMApmzgLnZmmTG20JlJRg6hAqyHEz5Cd4rUgrt0twmpC0Us_CG23KdUF5fWI55dcO2qAVvhNQXpqz7IiPcF7-jgkrx4oukYNY6eHA
+        scope:
+          type: string
+          description: Currently, the scope is limited to 'Connector' but can be used
+            for scoping purposes in the future. Scope is currently fixed to https://w3id.org/idsa/core/Connector.
+          example: https://w3id.org/idsa/core/Connector
     RequestToken:
       allOf:
       - $ref: '#/components/schemas/JwtHeader'
@@ -98,6 +338,178 @@ components:
           example: ids:DatPayload
     Signature:
       type: string
+    UnifiedContexts:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/UnifiedContexts_context'
+    ParticipantJsonLd:
+      allOf:
+      - $ref: '#/components/schemas/UnifiedContexts'
+      - $ref: '#/components/schemas/Participant'
+    IdentifiedEntity:
+      type: object
+      properties:
+        '@id':
+          type: string
+          example: http://some-uri-unique-to-the-entity-described-by-this-JSON-LD
+    Participant:
+      type: object
+      properties:
+        '@type':
+          type: string
+          example: ids:Participant
+        rdfs:label:
+          type: string
+          example: Name of the Participant
+        ids:corporateEmailAddress:
+          type: string
+          example: Main email contact.
+        ids:corporateHomepage:
+          type: string
+          example: Web presence of this ids:Participant
+        ids:memberPerson:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+        ids:primarySite:
+          $ref: '#/components/schemas/Participant_idsprimarySite'
+        ids:participantCertification:
+          type: string
+          example: A certificate.
+      allOf:
+      - $ref: '#/components/schemas/IdentifiedEntity'
+    Person:
+      type: object
+      properties:
+        '@type':
+          type: string
+          example: ids:Person
+        ids:phoneNumber:
+          type: string
+          example: A phone number.
+        ids:emailAddress:
+          type: string
+          example: A email address.
+        ids:familyName:
+          type: string
+          example: A family name.
+        ids:givenName:
+          type: string
+          example: A given name.
+        ids:homepage:
+          type: string
+          example: The homepage of the respective ids:Person.
+      allOf:
+      - $ref: '#/components/schemas/IdentifiedEntity'
+    infrastructureB_header_securityToken:
+      type: object
+      properties:
+        '@type':
+          type: string
+          example: ids:DynamicAttributeToken
+        tokenValue:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJAY29udGV4dCI6Imh0dHBzOi8vdzNpZC5vcmcvaWRzYS9jb250ZXh0cy9jb250ZXh0Lmpzb25sZCIsImlkczpyZWZlcnJpbmdDb25uZWN0b3IiOnsiaWRzOnNlY3VyaXR5UHJvZmlsZSI6Imlkc2M6QkFTRV9TRUNVUklUWV9QUk9GSUxFIiwiaWRzOmV4dGVuZGVkR3VhcmFudGVlIjoiaWRzYzpVU0FHRV9DT05UUk9MX1BPTElDWV9FTkZPUkNFTUVOVCIsIkBpZCI6Imh0dHA6Ly9zb21lLWNvbm5lY3Rvci11cmkuY29tIiwiaWRzOnRyYW5zcG9ydENlcnRzU2hhMjU2IjpbImJhY2I4Nzk1NzU3MzBiYjA4M2YyODNmZDViNjdhOGNiODk2OTQ0ZDFiZTI4YzdiMzIxMTdjZmM3NTdjODFlOTYiXX0sInNjb3BlIjoiaWRzX2Nvbm5lY3Rvcl9hdHRyaWJ1dGVzIiwiYXVkIjoiaWRzX2Nvbm5lY3RvcnNfYWxsIiwiaXNzIjoiaHR0cHM6Ly9kYXBzLmFpc2VjLmZyYXVuaG9mZXIuZGUiLCJzdWIiOiJDPURFLE89RnJhdW5ob2ZlcixPVT1BSVNFQyxDTj1lZGM1ZDdiMy1hMzk4LTQ4ZjAtYWJiMC0zNzUxNTMwYzRmZWQiLCJuYmYiOjE1Njc3MDM1NjQsImV4cCI6MTU2NzcwNzE2NH0.hcJmxUC9gNkXevsLpOYHgRNstOLn_tyAAhv-2_CGr8g
+        tokenFormat:
+          type: object
+          example: idsc:JWT
+    infrastructureB_header:
+      type: object
+      properties:
+        '@context':
+          type: string
+          example: https://w3id.org/idsa/contexts/context.jsonld
+        '@type':
+          type: string
+          example: ids:ParticipantAvailableMessage
+        '@id':
+          type: string
+          example: http://industrialdataspace.org/participantAvailableMessage/34d761cf-5ca4-4a77-a7f4-b14d8f75636a
+        modelVersion:
+          type: string
+          example: 3.0.0
+        issued:
+          type: string
+          example: 2019-06-21T13:32:33.073+02:00
+        issuerConnector:
+          type: string
+          example: http://example.org#connector
+        securityToken:
+          $ref: '#/components/schemas/infrastructureB_header_securityToken'
+    infrastructureB_payload:
+      type: object
+      properties:
+        '@context':
+          type: string
+          example: https://w3id.org/idsa/contexts/context.jsonld
+        '@type':
+          type: string
+          example: ids:Participant
+        '@id':
+          type: string
+          example: https://companyA.com/
+    body:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/infrastructureB_header'
+        payload:
+          $ref: '#/components/schemas/infrastructureB_payload'
+    inline_response_200:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/inline_response_200_header'
+        payload:
+          type: object
+    UnifiedContexts_context:
+      type: object
+      properties:
+        ids:
+          type: string
+          example: https://w3id.org/idsa/core/
+        idsc:
+          type: string
+          example: https://w3id.org/idsa/code/
+        rdfs:
+          type: string
+          example: https://
+    Participant_idsprimarySite:
+      type: object
+      properties:
+        '@type':
+          type: string
+          example: ids:Site
+        ids:siteAddress:
+          type: string
+          example: A valid street address.
+    inline_response_200_header:
+      type: object
+      properties:
+        '@context':
+          type: string
+          example: https://w3id.org/idsa/contexts/context.jsonld
+        '@type':
+          type: string
+          example: ids:MessageProcessedNotification
+        '@id':
+          type: string
+          example: http://industrialdataspace.org/messageProcessedNotification/34d761cf-5ca4-4a77-a7f4-b14d8f75636b
+        correlationMessage:
+          type: string
+          example: http://industrialdataspace.org/connectorAvailableMessage/34d761cf-5ca4-4a77-a7f4-b14d8f75636a
+        modelVersion:
+          type: string
+          example: 2.0.0
+        issued:
+          type: string
+          example: 2019-06-21T13:32:33.073+02:00
+        issuerConnector:
+          type: string
+          example: http://example.org#connector
+        securityToken:
+          $ref: '#/components/schemas/infrastructureB_header_securityToken'
   securitySchemes:
     application:
       type: oauth2
